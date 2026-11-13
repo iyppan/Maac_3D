@@ -1,6 +1,6 @@
 /**
- * NEXUS 3D | Modern 3D & Game Art Career Directory Application
- * Core Interactive Logic & State Controller
+ * IYAL STUDIOS | 3D & Game Art Career Directory Application
+ * Core Interactive Logic, Mobile State Controller & Responsive Engine
  */
 
 (function () {
@@ -14,8 +14,8 @@
     selectedHub: 'all',
     sortBy: 'default',
     activeView: 'cards', // 'cards' | 'table' | 'analytics' | 'roadmaps' | 'compare'
-    bookmarks: new Set(JSON.parse(localStorage.getItem('nexus3d_bookmarks') || '[]')),
-    compareList: new Set(JSON.parse(localStorage.getItem('nexus3d_compare') || '[]')),
+    bookmarks: new Set(JSON.parse(localStorage.getItem('iyal_bookmarks') || localStorage.getItem('nexus3d_bookmarks') || '[]')),
+    compareList: new Set(JSON.parse(localStorage.getItem('iyal_compare') || localStorage.getItem('nexus3d_compare') || '[]')),
     wizardStep: 1,
     wizardAnswers: {}
   };
@@ -34,6 +34,7 @@
     softwareStrip: document.getElementById('softwareStrip'),
     activeFilterChips: document.getElementById('activeFilterChips'),
     navTabs: document.querySelectorAll('.nav-tab-btn'),
+    mobileNavItems: document.querySelectorAll('.mobile-nav-item'),
     viewToggles: document.querySelectorAll('.btn-view-toggle'),
     views: {
       cards: document.getElementById('viewCards'),
@@ -44,23 +45,21 @@
     },
     bookmarkCountBadge: document.getElementById('bookmarkCountBadge'),
     compareCountBadge: document.getElementById('compareCountBadge'),
+    mobileSavedBadge: document.getElementById('mobileSavedBadge'),
+    mobileFilterIndicator: document.getElementById('mobileFilterIndicator'),
     roleModal: document.getElementById('roleModal'),
     roleModalContent: document.getElementById('roleModalContent'),
     bookmarksModal: document.getElementById('bookmarksModal'),
     bookmarksModalContent: document.getElementById('bookmarksModalContent'),
     wizardModal: document.getElementById('wizardModal'),
     wizardModalContent: document.getElementById('wizardModalContent'),
+    mobileFilterModal: document.getElementById('mobileFilterModal'),
+    mobileSwSelect: document.getElementById('mobileSwSelect'),
+    mobileIndSelect: document.getElementById('mobileIndSelect'),
+    mobileHubSelect: document.getElementById('mobileHubSelect'),
+    mobileSortSelect: document.getElementById('mobileSortSelect'),
     toastContainer: document.getElementById('toastContainer'),
     themeToggleBtn: document.getElementById('themeToggleBtn')
-  };
-
-  // Software Suite Icons / Color mapping
-  const SOFTWARE_ICONS = {
-    max: `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"></path><polyline points="3.27 6.96 12 12.01 20.73 6.96"></polyline><line x1="12" y1="22.08" x2="12" y2="12"></line></svg>`,
-    maya: `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><path d="M8 12l2 2 4-4"></path></svg>`,
-    substance: `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>`,
-    marvelous: `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M20.38 3.46L16 2a4 4 0 0 1-8 0L3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z"></path></svg>`,
-    unreal: `<svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>`
   };
 
   /**
@@ -81,7 +80,7 @@
    * Theme Support
    */
   function initTheme() {
-    const savedTheme = localStorage.getItem('nexus3d_theme') || 'dark';
+    const savedTheme = localStorage.getItem('iyal_theme') || localStorage.getItem('nexus3d_theme') || 'dark';
     document.documentElement.setAttribute('data-theme', savedTheme);
   }
 
@@ -89,19 +88,19 @@
     const current = document.documentElement.getAttribute('data-theme') || 'dark';
     const next = current === 'dark' ? 'light' : 'dark';
     document.documentElement.setAttribute('data-theme', next);
-    localStorage.setItem('nexus3d_theme', next);
+    localStorage.setItem('iyal_theme', next);
     showToast(`Switched to ${next} theme mode`, 'info');
   }
 
   /**
-   * Render Top Software Filter Strip with Live Badges
+   * Render Top Software Filter Strip (Swipeable on Mobile)
    */
   function renderSoftwareFilterStrip() {
     if (!DOM.softwareStrip) return;
 
     let html = `
       <button class="software-filter-pill ${state.activeSoftware === 'all' ? 'active' : ''}" data-sw="all">
-        <span>All Software Suites</span>
+        <span>All Software</span>
         <span class="sw-count">44 Roles</span>
       </button>
     `;
@@ -112,14 +111,14 @@
         <button class="software-filter-pill ${isActive ? 'active' : ''}" data-sw="${sw.id}">
           <span class="sw-dot" style="background: ${sw.color}; box-shadow: 0 0 8px ${sw.color};"></span>
           <span>${sw.shortName}</span>
-          <span class="sw-count">${sw.roleCount} (${sw.sharePercent}%)</span>
+          <span class="sw-count">${sw.roleCount}</span>
         </button>
       `;
     });
 
     DOM.softwareStrip.innerHTML = html;
 
-    // Attach click handlers
+    // Attach click listeners
     DOM.softwareStrip.querySelectorAll('.software-filter-pill').forEach(btn => {
       btn.addEventListener('click', () => {
         const sw = btn.getAttribute('data-sw');
@@ -132,8 +131,6 @@
    * Populate Industry & Hub Dropdowns Dynamically
    */
   function populateDropdowns() {
-    if (!DOM.industryFilter || !DOM.hubFilter) return;
-
     // Extract unique industries
     const industrySet = new Set();
     ROLES_DATA.forEach(r => {
@@ -142,14 +139,24 @@
     });
 
     const sortedIndustries = Array.from(industrySet).sort();
+
+    // Populate Desktop & Mobile Industry Dropdowns
     sortedIndustries.forEach(ind => {
-      const opt = document.createElement('option');
-      opt.value = ind;
-      opt.textContent = ind;
-      DOM.industryFilter.appendChild(opt);
+      if (DOM.industryFilter) {
+        const opt = document.createElement('option');
+        opt.value = ind;
+        opt.textContent = ind;
+        DOM.industryFilter.appendChild(opt);
+      }
+      if (DOM.mobileIndSelect) {
+        const opt2 = document.createElement('option');
+        opt2.value = ind;
+        opt2.textContent = ind;
+        DOM.mobileIndSelect.appendChild(opt2);
+      }
     });
 
-    // Populate Top Production Hubs
+    // Top Production Hubs
     const hubs = [
       "Bengaluru",
       "Mumbai",
@@ -162,10 +169,18 @@
     ];
 
     hubs.forEach(h => {
-      const opt = document.createElement('option');
-      opt.value = h;
-      opt.textContent = h;
-      DOM.hubFilter.appendChild(opt);
+      if (DOM.hubFilter) {
+        const opt = document.createElement('option');
+        opt.value = h;
+        opt.textContent = h;
+        DOM.hubFilter.appendChild(opt);
+      }
+      if (DOM.mobileHubSelect) {
+        const opt2 = document.createElement('option');
+        opt2.value = h;
+        opt2.textContent = h;
+        DOM.mobileHubSelect.appendChild(opt2);
+      }
     });
   }
 
@@ -230,7 +245,7 @@
   }
 
   /**
-   * Apply Filter Pipeline and Re-render Active Views
+   * Apply Filter Pipeline and Re-render Views
    */
   function applyFilters() {
     const filtered = getFilteredRoles();
@@ -238,6 +253,12 @@
     // Update Counter Display
     if (DOM.rolesCountDisplay) {
       DOM.rolesCountDisplay.innerHTML = `Showing <span>${filtered.length}</span> of <span>${ROLES_DATA.length}</span> roles`;
+    }
+
+    // Check if any filter is active for mobile indicator
+    const hasActiveFilters = state.activeSoftware !== 'all' || state.selectedIndustry !== 'all' || state.selectedHub !== 'all' || state.sortBy !== 'default';
+    if (DOM.mobileFilterIndicator) {
+      DOM.mobileFilterIndicator.style.display = hasActiveFilters ? 'inline-block' : 'none';
     }
 
     renderActiveFilterChips();
@@ -272,7 +293,8 @@
         label: `Industry: ${state.selectedIndustry}`,
         onClear: () => {
           state.selectedIndustry = 'all';
-          DOM.industryFilter.value = 'all';
+          if (DOM.industryFilter) DOM.industryFilter.value = 'all';
+          if (DOM.mobileIndSelect) DOM.mobileIndSelect.value = 'all';
           applyFilters();
         }
       });
@@ -283,7 +305,8 @@
         label: `Hub: ${state.selectedHub}`,
         onClear: () => {
           state.selectedHub = 'all';
-          DOM.hubFilter.value = 'all';
+          if (DOM.hubFilter) DOM.hubFilter.value = 'all';
+          if (DOM.mobileHubSelect) DOM.mobileHubSelect.value = 'all';
           applyFilters();
         }
       });
@@ -322,17 +345,17 @@
   }
 
   /**
-   * Render Role Cards Grid (View 1)
+   * Render Role Cards Grid (View 1) - Touch-Optimized for Mobile
    */
   function renderCardsView(roles) {
     if (!DOM.rolesGrid) return;
 
     if (roles.length === 0) {
       DOM.rolesGrid.innerHTML = `
-        <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 1.5rem; background: var(--bg-card); border-radius: var(--radius-lg); border: 1px dashed var(--border-medium);">
-          <svg viewBox="0 0 24 24" width="48" height="48" stroke="var(--text-dim)" stroke-width="1.5" fill="none" style="margin-bottom: 1rem;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem;">No matching roles found</h3>
-          <p style="color: var(--text-muted); max-width: 450px; margin: 0 auto 1.5rem;">Try relaxing your search terms or clearing current software and city filters to discover more career paths.</p>
+        <div style="grid-column: 1 / -1; text-align: center; padding: 3.5rem 1.25rem; background: var(--bg-card); border-radius: var(--radius-lg); border: 1px dashed var(--border-medium);">
+          <svg viewBox="0 0 24 24" width="44" height="44" stroke="var(--text-dim)" stroke-width="1.5" fill="none" style="margin-bottom: 0.85rem;"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+          <h3 style="font-size: 1.2rem; margin-bottom: 0.4rem;">No matching roles found</h3>
+          <p style="color: var(--text-muted); font-size: 0.88rem; max-width: 440px; margin: 0 auto 1.25rem;">Try clearing current filters to discover more career paths at IYAL STUDIOS.</p>
           <button class="btn-primary-action" id="emptyResetBtn" style="margin: 0 auto;">Reset All Filters</button>
         </div>
       `;
@@ -347,7 +370,7 @@
       const isCompared = state.compareList.has(role.id);
 
       const companionToolTags = role.companionTools.map(tool => `
-        <span class="tool-tag" onclick="window.Nexus3D.filterByTool('${escapeQuotes(tool)}')">${tool}</span>
+        <span class="tool-tag" onclick="window.IyalStudios.filterByTool('${escapeQuotes(tool)}')">${tool}</span>
       `).join('');
 
       return `
@@ -388,20 +411,20 @@
           </div>
 
           <div class="role-card-footer">
-            <button class="btn-card-details" onclick="window.Nexus3D.openRoleModal('${role.id}')">
+            <button class="btn-card-details" onclick="window.IyalStudios.openRoleModal('${role.id}')">
               <span>View Blueprint</span>
               <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="5" y1="12" x2="19" y2="12"></line><polyline points="12 5 19 12 12 19"></polyline></svg>
             </button>
             
             <button class="btn-card-action-icon ${isCompared ? 'active-compare' : ''}" 
                     title="${isCompared ? 'Remove from Compare' : 'Add to Compare'}"
-                    onclick="window.Nexus3D.toggleCompare('${role.id}')">
+                    onclick="window.IyalStudios.toggleCompare('${role.id}')">
               <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
             </button>
 
             <button class="btn-card-action-icon ${isBookmarked ? 'active-bookmark' : ''}" 
                     title="${isBookmarked ? 'Remove Bookmark' : 'Save to Shortlist'}"
-                    onclick="window.Nexus3D.toggleBookmark('${role.id}')">
+                    onclick="window.IyalStudios.toggleBookmark('${role.id}')">
               <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="${isBookmarked ? 'currentColor' : 'none'}"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
             </button>
           </div>
@@ -419,7 +442,7 @@
     if (roles.length === 0) {
       DOM.matrixTableBody.innerHTML = `
         <tr>
-          <td colspan="7" style="text-align: center; padding: 3rem; color: var(--text-dim);">No matching records found.</td>
+          <td colspan="7" style="text-align: center; padding: 2.5rem; color: var(--text-dim);">No matching records found.</td>
         </tr>
       `;
       return;
@@ -427,29 +450,28 @@
 
     DOM.matrixTableBody.innerHTML = roles.map(role => {
       const sw = SOFTWARE_METADATA[role.softwareKey] || {};
-      const isBookmarked = state.bookmarks.has(role.id);
 
       return `
         <tr>
           <td class="col-id">${role.id}</td>
           <td>
-            <span class="role-sw-badge ${sw.badgeClass}" style="font-size: 0.7rem; padding: 2px 8px;">
+            <span class="role-sw-badge ${sw.badgeClass}" style="font-size: 0.68rem; padding: 2px 7px;">
               ${sw.shortName}
             </span>
           </td>
           <td class="col-role">
-            <a href="javascript:void(0)" onclick="window.Nexus3D.openRoleModal('${role.id}')" style="color: var(--text-highlight); text-decoration: none; border-bottom: 1px dotted var(--border-medium);">
+            <a href="javascript:void(0)" onclick="window.IyalStudios.openRoleModal('${role.id}')" style="color: var(--text-highlight); text-decoration: none; border-bottom: 1px dotted var(--border-medium);">
               ${role.title}
             </a>
           </td>
           <td class="col-industry">${role.industry}</td>
           <td class="col-resp">${role.responsibilities}</td>
           <td>
-            <div style="display: flex; flex-wrap: wrap; gap: 4px; max-width: 260px;">
-              ${role.companionTools.map(t => `<span class="tool-tag" style="font-size: 0.68rem; padding: 1px 5px;" onclick="window.Nexus3D.filterByTool('${escapeQuotes(t)}')">${t}</span>`).join('')}
+            <div style="display: flex; flex-wrap: wrap; gap: 4px; max-width: 240px;">
+              ${role.companionTools.map(t => `<span class="tool-tag" style="font-size: 0.65rem; padding: 1px 5px;" onclick="window.IyalStudios.filterByTool('${escapeQuotes(t)}')">${t}</span>`).join('')}
             </div>
           </td>
-          <td style="font-size: 0.8rem; color: var(--text-dim); max-width: 200px;">
+          <td style="font-size: 0.78rem; color: var(--text-dim); max-width: 190px;">
             ${role.hubs.join(', ')}
           </td>
         </tr>
@@ -475,7 +497,7 @@
           <div class="progress-track">
             <div class="progress-fill" style="width: ${sw.sharePercent}%; background: ${sw.color}; box-shadow: 0 0 10px ${sw.color};"></div>
           </div>
-          <div style="font-size: 0.75rem; color: var(--text-dim); margin-top: 4px;">
+          <div style="font-size: 0.72rem; color: var(--text-dim); margin-top: 4px;">
             ${sw.focus}
           </div>
         </div>
@@ -484,7 +506,7 @@
 
     if (hubsContainer) {
       hubsContainer.innerHTML = ECOSYSTEM_STATS.topHubs.map((hub, idx) => `
-        <div class="hub-rank-row" onclick="window.Nexus3D.filterByHub('${hub.name}')" style="cursor: pointer;">
+        <div class="hub-rank-row" onclick="window.IyalStudios.filterByHub('${hub.name}')" style="cursor: pointer;">
           <div class="hub-rank-left">
             <span class="hub-index">#${idx + 1}</span>
             <div>
@@ -499,7 +521,7 @@
 
     if (toolsContainer) {
       toolsContainer.innerHTML = ECOSYSTEM_STATS.popularCompanionTools.map(tool => `
-        <div class="synergy-tool-box" onclick="window.Nexus3D.filterByTool('${escapeQuotes(tool.name)}')" style="cursor: pointer;">
+        <div class="synergy-tool-box" onclick="window.IyalStudios.filterByTool('${escapeQuotes(tool.name)}')" style="cursor: pointer;">
           <div class="synergy-tool-count">${tool.count}</div>
           <div class="synergy-tool-name">${tool.name}</div>
         </div>
@@ -517,7 +539,7 @@
     container.innerHTML = ECOSYSTEM_STATS.pipelines.map(pipe => `
       <section class="pipeline-card">
         <div class="pipeline-header">
-          <div class="pipeline-tag">Industry Blueprint</div>
+          <div class="pipeline-tag">Studio Pipeline Blueprint</div>
           <h3 class="pipeline-title">${pipe.title}</h3>
           <p class="pipeline-desc">${pipe.description}</p>
         </div>
@@ -547,11 +569,11 @@
 
     if (list.length === 0) {
       container.innerHTML = `
-        <div style="text-align: center; padding: 4rem 1.5rem;">
-          <svg viewBox="0 0 24 24" width="48" height="48" stroke="var(--text-dim)" stroke-width="1.5" fill="none" style="margin-bottom: 1rem;"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
-          <h3 style="font-size: 1.3rem; margin-bottom: 0.5rem;">No roles selected for comparison</h3>
-          <p style="color: var(--text-muted); max-width: 480px; margin: 0 auto 1.5rem;">Click the compare icon on any role card to compare up to 3 roles side-by-side in real-time.</p>
-          <button class="btn-primary-action" onclick="window.Nexus3D.switchView('cards')" style="margin: 0 auto;">Browse 44 Roles</button>
+        <div style="text-align: center; padding: 3.5rem 1.25rem;">
+          <svg viewBox="0 0 24 24" width="44" height="44" stroke="var(--text-dim)" stroke-width="1.5" fill="none" style="margin-bottom: 0.85rem;"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+          <h3 style="font-size: 1.2rem; margin-bottom: 0.4rem;">No roles selected for comparison</h3>
+          <p style="color: var(--text-muted); font-size: 0.88rem; max-width: 440px; margin: 0 auto 1.25rem;">Tap the compare icon on any role card to compare up to 3 roles side-by-side.</p>
+          <button class="btn-primary-action" onclick="window.IyalStudios.switchView('cards')" style="margin: 0 auto;">Browse All Roles</button>
         </div>
       `;
       return;
@@ -560,12 +582,12 @@
     const comparedRoles = list.map(id => ROLES_DATA.find(r => r.id === id)).filter(Boolean);
 
     container.innerHTML = `
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 0.5rem;">
         <div>
-          <h3 style="font-size: 1.3rem;">Side-by-Side Role Matrix</h3>
-          <p style="color: var(--text-muted); font-size: 0.88rem;">Comparing ${comparedRoles.length} of 3 maximum roles</p>
+          <h3 style="font-size: 1.2rem;">Side-by-Side Role Matrix</h3>
+          <p style="color: var(--text-muted); font-size: 0.82rem;">Comparing ${comparedRoles.length} of 3 maximum roles</p>
         </div>
-        <button class="btn-reset-filters" onclick="window.Nexus3D.clearCompare()">Clear Comparison</button>
+        <button class="btn-reset-filters" onclick="window.IyalStudios.clearCompare()">Clear Comparison</button>
       </div>
 
       <div class="comparison-grid">
@@ -573,13 +595,13 @@
           const sw = SOFTWARE_METADATA[role.softwareKey] || {};
           return `
             <div class="compare-column" style="border-top: 3px solid ${sw.color};">
-              <button class="compare-remove-btn" onclick="window.Nexus3D.toggleCompare('${role.id}')" title="Remove role">
+              <button class="compare-remove-btn" onclick="window.IyalStudios.toggleCompare('${role.id}')" title="Remove role">
                 <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
               </button>
 
-              <span class="role-id-badge" style="width: fit-content; margin-bottom: 0.5rem;">${role.id}</span>
-              <h4 style="font-size: 1.15rem; margin-bottom: 0.4rem;">${role.title}</h4>
-              <span class="role-sw-badge ${sw.badgeClass}" style="width: fit-content; margin-bottom: 1.25rem;">${sw.name}</span>
+              <span class="role-id-badge" style="width: fit-content; margin-bottom: 0.4rem;">${role.id}</span>
+              <h4 style="font-size: 1.1rem; margin-bottom: 0.35rem;">${role.title}</h4>
+              <span class="role-sw-badge ${sw.badgeClass}" style="width: fit-content; margin-bottom: 1.1rem;">${sw.name}</span>
 
               <div class="compare-metric-block">
                 <div class="compare-metric-title">Primary Industry</div>
@@ -600,7 +622,7 @@
 
               <div class="compare-metric-block">
                 <div class="compare-metric-title">High-Demand Hubs</div>
-                <div class="compare-metric-val" style="font-size: 0.82rem; color: var(--text-dim);">${role.hubs.join(', ')}</div>
+                <div class="compare-metric-val" style="font-size: 0.8rem; color: var(--text-dim);">${role.hubs.join(', ')}</div>
               </div>
 
               <div class="compare-metric-block">
@@ -608,7 +630,7 @@
                 <div class="compare-metric-val" style="color: #22c55e; font-weight: 700;">${role.demandLevel}</div>
               </div>
 
-              <button class="btn-primary-action" style="margin-top: auto;" onclick="window.Nexus3D.openRoleModal('${role.id}')">
+              <button class="btn-primary-action" style="margin-top: auto;" onclick="window.IyalStudios.openRoleModal('${role.id}')">
                 Open Blueprint
               </button>
             </div>
@@ -631,17 +653,17 @@
     DOM.roleModalContent.innerHTML = `
       <div class="modal-header">
         <div>
-          <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
-            <span class="role-id-badge" style="font-size: 0.85rem;">${role.id}</span>
+          <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.35rem; flex-wrap: wrap;">
+            <span class="role-id-badge" style="font-size: 0.8rem;">${role.id}</span>
             <span class="role-sw-badge ${sw.badgeClass}">${sw.name}</span>
-            <span style="font-size: 0.75rem; font-family: var(--font-mono); color: #22c55e; background: rgba(34, 197, 94, 0.1); padding: 2px 8px; border-radius: var(--radius-full); border: 1px solid rgba(34, 197, 94, 0.25);">
+            <span style="font-size: 0.72rem; font-family: var(--font-mono); color: #22c55e; background: rgba(34, 197, 94, 0.1); padding: 2px 7px; border-radius: var(--radius-full); border: 1px solid rgba(34, 197, 94, 0.25);">
               ● ${role.demandLevel} Demand
             </span>
           </div>
-          <h2 style="font-size: 1.6rem;">${role.title}</h2>
-          <div style="color: #38bdf8; font-size: 0.9rem; margin-top: 0.25rem;">${role.industry}</div>
+          <h2 style="font-size: 1.45rem;">${role.title}</h2>
+          <div style="color: #38bdf8; font-size: 0.85rem; margin-top: 0.2rem;">${role.industry}</div>
         </div>
-        <button class="modal-close-btn" onclick="window.Nexus3D.closeModal('roleModal')">
+        <button class="modal-close-btn" onclick="window.IyalStudios.closeModal('roleModal')">
           <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
       </div>
@@ -652,7 +674,7 @@
             <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
             Core Industry Responsibilities
           </div>
-          <p class="modal-text" style="font-size: 1.05rem; font-weight: 500;">${role.responsibilities}</p>
+          <p class="modal-text" style="font-size: 1rem; font-weight: 500;">${role.responsibilities}</p>
         </div>
 
         <div class="modal-detail-row">
@@ -668,8 +690,8 @@
             <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
             Full Companion Software Ecosystem
           </div>
-          <div class="tools-chips-list" style="margin-top: 0.5rem;">
-            ${role.companionTools.map(tool => `<span class="tool-tag" style="font-size: 0.85rem; padding: 0.35rem 0.8rem;">${tool}</span>`).join('')}
+          <div class="tools-chips-list" style="margin-top: 0.4rem;">
+            ${role.companionTools.map(tool => `<span class="tool-tag" style="font-size: 0.8rem; padding: 0.3rem 0.7rem;">${tool}</span>`).join('')}
           </div>
         </div>
 
@@ -679,7 +701,7 @@
               <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
               Hiring Portfolio Recommendation
             </div>
-            <p class="modal-text" style="color: #e2e8f0; font-size: 0.92rem;">
+            <p class="modal-text" style="color: #e2e8f0; font-size: 0.88rem;">
               ${role.portfolioTip || 'Build a cohesive 3-piece portfolio project showing high-to-low poly workflow, clean topology, and real-time engine integration.'}
             </p>
           </div>
@@ -690,30 +712,69 @@
             <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
             Key Production Hubs & Markets
           </div>
-          <p class="modal-text" style="color: var(--text-dim);">${role.hubs.join(' • ')}</p>
+          <p class="modal-text" style="color: var(--text-dim); font-size: 0.85rem;">${role.hubs.join(' • ')}</p>
         </div>
       </div>
 
       <div class="modal-footer">
         <button class="btn-card-action-icon ${isBookmarked ? 'active-bookmark' : ''}" 
-                onclick="window.Nexus3D.toggleBookmark('${role.id}'); window.Nexus3D.openRoleModal('${role.id}');"
+                onclick="window.IyalStudios.toggleBookmark('${role.id}'); window.IyalStudios.openRoleModal('${role.id}');"
                 title="Save to My Shortlist">
           <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="${isBookmarked ? 'currentColor' : 'none'}"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
         </button>
 
-        <div style="display: flex; gap: 0.75rem;">
-          <button class="btn-reset-filters" onclick="window.Nexus3D.copyRoleShareText('${role.id}')">
+        <div style="display: flex; gap: 0.6rem;">
+          <button class="btn-reset-filters" onclick="window.IyalStudios.copyRoleShareText('${role.id}')">
             <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
-            Copy Summary
+            Copy
           </button>
-          <button class="btn-primary-action" onclick="window.Nexus3D.closeModal('roleModal')">
-            Close Blueprint
+          <button class="btn-primary-action" onclick="window.IyalStudios.closeModal('roleModal')">
+            Close
           </button>
         </div>
       </div>
     `;
 
     DOM.roleModal.classList.add('active');
+  }
+
+  /**
+   * Mobile Filter Sheet Trigger
+   */
+  function openMobileFilterModal() {
+    if (!DOM.mobileFilterModal) return;
+
+    if (DOM.mobileSwSelect) DOM.mobileSwSelect.value = state.activeSoftware;
+    if (DOM.mobileIndSelect) DOM.mobileIndSelect.value = state.selectedIndustry;
+    if (DOM.mobileHubSelect) DOM.mobileHubSelect.value = state.selectedHub;
+    if (DOM.mobileSortSelect) DOM.mobileSortSelect.value = state.sortBy;
+
+    DOM.mobileFilterModal.classList.add('active');
+  }
+
+  function applyMobileFilters() {
+    if (DOM.mobileSwSelect) {
+      state.activeSoftware = DOM.mobileSwSelect.value;
+      renderSoftwareFilterStrip();
+    }
+    if (DOM.mobileIndSelect) {
+      state.selectedIndustry = DOM.mobileIndSelect.value;
+      if (DOM.industryFilter) DOM.industryFilter.value = state.selectedIndustry;
+    }
+    if (DOM.mobileHubSelect) {
+      state.selectedHub = DOM.mobileHubSelect.value;
+      if (DOM.hubFilter) DOM.hubFilter.value = state.selectedHub;
+    }
+    if (DOM.mobileSortSelect) {
+      state.sortBy = DOM.mobileSortSelect.value;
+      if (DOM.sortSelect) DOM.sortSelect.value = state.sortBy;
+    }
+
+    if (state.activeView !== 'cards' && state.activeView !== 'table') {
+      switchView('cards');
+    }
+    applyFilters();
+    showToast('Applied custom filters', 'info');
   }
 
   /**
@@ -734,9 +795,9 @@
         <div class="modal-header">
           <div>
             <div class="pipeline-tag">Step 1 of 3</div>
-            <h2 style="font-size: 1.4rem;">What drives your creative passion?</h2>
+            <h2 style="font-size: 1.3rem;">What drives your creative passion?</h2>
           </div>
-          <button class="modal-close-btn" onclick="window.Nexus3D.closeModal('wizardModal')">
+          <button class="modal-close-btn" onclick="window.IyalStudios.closeModal('wizardModal')">
             <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
         </div>
@@ -747,42 +808,42 @@
             <div class="wizard-step-dot"></div>
           </div>
           <div class="wizard-options-list">
-            <button class="wizard-option-btn" onclick="window.Nexus3D.setWizardAnswer('passion', 'realtime_games')">
+            <button class="wizard-option-btn" onclick="window.IyalStudios.setWizardAnswer('passion', 'realtime_games')">
               <div>
                 <strong>Interactive Games & Real-Time Worlds</strong>
-                <div style="font-size: 0.8rem; color: var(--text-dim); margin-top: 2px;">C++, Blueprints, Level Design, Niagara VFX, Nanite environments</div>
+                <div style="font-size: 0.78rem; color: var(--text-dim); margin-top: 2px;">C++, Blueprints, Level Design, Niagara VFX, Nanite environments</div>
               </div>
               <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
             </button>
 
-            <button class="wizard-option-btn" onclick="window.Nexus3D.setWizardAnswer('passion', 'vfx_film')">
+            <button class="wizard-option-btn" onclick="window.IyalStudios.setWizardAnswer('passion', 'vfx_film')">
               <div>
                 <strong>Cinematic Characters, Animation & Film VFX</strong>
-                <div style="font-size: 0.8rem; color: var(--text-dim); margin-top: 2px;">Creature rigging, keyframe acting, lookdev, Arnold, nCloth simulation</div>
+                <div style="font-size: 0.78rem; color: var(--text-dim); margin-top: 2px;">Creature rigging, keyframe acting, lookdev, Arnold, nCloth simulation</div>
               </div>
               <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
             </button>
 
-            <button class="wizard-option-btn" onclick="window.Nexus3D.setWizardAnswer('passion', 'texturing_surfacing')">
+            <button class="wizard-option-btn" onclick="window.IyalStudios.setWizardAnswer('passion', 'texturing_surfacing')">
               <div>
                 <strong>PBR Materials, Texturing & Surfacing</strong>
-                <div style="font-size: 0.8rem; color: var(--text-dim); margin-top: 2px;">Substance Painter smart masks, photorealism, weathering, UDIM workflows</div>
+                <div style="font-size: 0.78rem; color: var(--text-dim); margin-top: 2px;">Substance Painter smart masks, photorealism, weathering, UDIM workflows</div>
               </div>
               <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
             </button>
 
-            <button class="wizard-option-btn" onclick="window.Nexus3D.setWizardAnswer('passion', 'archviz_spaces')">
+            <button class="wizard-option-btn" onclick="window.IyalStudios.setWizardAnswer('passion', 'archviz_spaces')">
               <div>
                 <strong>Photorealistic Architecture & Spaces</strong>
-                <div style="font-size: 0.8rem; color: var(--text-dim); margin-top: 2px;">3ds Max, V-Ray, Corona, CAD blueprints, lighting & interior luxury styling</div>
+                <div style="font-size: 0.78rem; color: var(--text-dim); margin-top: 2px;">3ds Max, V-Ray, Corona, CAD blueprints, lighting & interior luxury styling</div>
               </div>
               <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
             </button>
 
-            <button class="wizard-option-btn" onclick="window.Nexus3D.setWizardAnswer('passion', 'digital_fashion')">
+            <button class="wizard-option-btn" onclick="window.IyalStudios.setWizardAnswer('passion', 'digital_fashion')">
               <div>
                 <strong>Digital Fashion & Virtual Garments</strong>
-                <div style="font-size: 0.8rem; color: var(--text-dim); margin-top: 2px;">Marvelous Designer pattern cuts, dynamic cloth physics, avatar costumes</div>
+                <div style="font-size: 0.78rem; color: var(--text-dim); margin-top: 2px;">Marvelous Designer pattern cuts, dynamic cloth physics, avatar costumes</div>
               </div>
               <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
             </button>
@@ -794,9 +855,9 @@
         <div class="modal-header">
           <div>
             <div class="pipeline-tag">Step 2 of 3</div>
-            <h2 style="font-size: 1.4rem;">What is your technical / artistic preference?</h2>
+            <h2 style="font-size: 1.3rem;">What is your technical / artistic preference?</h2>
           </div>
-          <button class="modal-close-btn" onclick="window.Nexus3D.closeModal('wizardModal')">
+          <button class="modal-close-btn" onclick="window.IyalStudios.closeModal('wizardModal')">
             <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
         </div>
@@ -807,26 +868,26 @@
             <div class="wizard-step-dot"></div>
           </div>
           <div class="wizard-options-list">
-            <button class="wizard-option-btn" onclick="window.Nexus3D.setWizardAnswer('profile', 'pure_artistic')">
+            <button class="wizard-option-btn" onclick="window.IyalStudios.setWizardAnswer('profile', 'pure_artistic')">
               <div>
                 <strong>100% Pure Artistic & Aesthetics</strong>
-                <div style="font-size: 0.8rem; color: var(--text-dim); margin-top: 2px;">Sculpting, texturing, animation timing, color harmony, visual mood</div>
+                <div style="font-size: 0.78rem; color: var(--text-dim); margin-top: 2px;">Sculpting, texturing, animation timing, color harmony, visual mood</div>
               </div>
               <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
             </button>
 
-            <button class="wizard-option-btn" onclick="window.Nexus3D.setWizardAnswer('profile', 'technical_code')">
+            <button class="wizard-option-btn" onclick="window.IyalStudios.setWizardAnswer('profile', 'technical_code')">
               <div>
                 <strong>Technical Artist & Programming</strong>
-                <div style="font-size: 0.8rem; color: var(--text-dim); margin-top: 2px;">Python scripting, shaders, C++, rig mechanics, pipeline automation</div>
+                <div style="font-size: 0.78rem; color: var(--text-dim); margin-top: 2px;">Python scripting, shaders, C++, rig mechanics, pipeline automation</div>
               </div>
               <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
             </button>
 
-            <button class="wizard-option-btn" onclick="window.Nexus3D.setWizardAnswer('profile', 'hybrid')">
+            <button class="wizard-option-btn" onclick="window.IyalStudios.setWizardAnswer('profile', 'hybrid')">
               <div>
                 <strong>Balanced Hybrid (Art + Logic)</strong>
-                <div style="font-size: 0.8rem; color: var(--text-dim); margin-top: 2px;">Blueprints, node graph shaders, level assembly, physical lighting</div>
+                <div style="font-size: 0.78rem; color: var(--text-dim); margin-top: 2px;">Blueprints, node graph shaders, level assembly, physical lighting</div>
               </div>
               <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><polyline points="9 18 15 12 9 6"></polyline></svg>
             </button>
@@ -834,16 +895,15 @@
         </div>
       `;
     } else if (state.wizardStep === 3) {
-      // Calculate Matches
       const matches = calculateWizardMatches(state.wizardAnswers);
 
       DOM.wizardModalContent.innerHTML = `
         <div class="modal-header">
           <div>
             <div class="pipeline-tag" style="color: #22c55e;">Match Results</div>
-            <h2 style="font-size: 1.4rem;">Top Career Matches for Your Profile</h2>
+            <h2 style="font-size: 1.3rem;">Top Career Matches for Your Profile</h2>
           </div>
-          <button class="modal-close-btn" onclick="window.Nexus3D.closeModal('wizardModal')">
+          <button class="modal-close-btn" onclick="window.IyalStudios.closeModal('wizardModal')">
             <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
           </button>
         </div>
@@ -854,28 +914,28 @@
             <div class="wizard-step-dot active"></div>
           </div>
 
-          <p style="color: var(--text-muted); margin-bottom: 1.5rem; font-size: 0.95rem;">
+          <p style="color: var(--text-muted); margin-bottom: 1.25rem; font-size: 0.9rem;">
             Based on your passion for <strong>${formatAnswer(state.wizardAnswers.passion)}</strong> and your <strong>${formatAnswer(state.wizardAnswers.profile)}</strong> style, here are your best-aligned industry paths:
           </p>
 
-          <div style="display: flex; flex-direction: column; gap: 1rem;">
+          <div style="display: flex; flex-direction: column; gap: 0.85rem;">
             ${matches.map(role => {
               const sw = SOFTWARE_METADATA[role.softwareKey] || {};
               return `
-                <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-medium); border-left: 4px solid ${sw.color}; border-radius: var(--radius-md); padding: 1.25rem;">
-                  <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.5rem;">
+                <div style="background: rgba(255, 255, 255, 0.03); border: 1px solid var(--border-medium); border-left: 4px solid ${sw.color}; border-radius: var(--radius-md); padding: 1.15rem;">
+                  <div style="display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.4rem;">
                     <div>
-                      <span class="role-id-badge" style="font-size: 0.72rem;">${role.id}</span>
-                      <span class="role-sw-badge ${sw.badgeClass}" style="margin-left: 0.4rem;">${sw.name}</span>
+                      <span class="role-id-badge" style="font-size: 0.7rem;">${role.id}</span>
+                      <span class="role-sw-badge ${sw.badgeClass}" style="margin-left: 0.35rem;">${sw.name}</span>
                     </div>
-                    <span style="font-size: 0.75rem; font-weight: 700; color: #22c55e;">${role.demandLevel} Demand</span>
+                    <span style="font-size: 0.72rem; font-weight: 700; color: #22c55e;">${role.demandLevel} Demand</span>
                   </div>
-                  <h4 style="font-size: 1.15rem; margin-bottom: 0.4rem;">${role.title}</h4>
-                  <p style="font-size: 0.85rem; color: var(--text-muted); margin-bottom: 0.85rem;">${role.responsibilities}</p>
+                  <h4 style="font-size: 1.05rem; margin-bottom: 0.35rem;">${role.title}</h4>
+                  <p style="font-size: 0.82rem; color: var(--text-muted); margin-bottom: 0.75rem;">${role.responsibilities}</p>
                   
-                  <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <div style="font-size: 0.78rem; color: var(--text-dim);">${role.hubs.slice(0, 3).join(', ')}</div>
-                    <button class="btn-card-details" style="flex: 0 0 auto;" onclick="window.Nexus3D.closeModal('wizardModal'); window.Nexus3D.openRoleModal('${role.id}')">
+                  <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 0.5rem;">
+                    <div style="font-size: 0.75rem; color: var(--text-dim);">${role.hubs.slice(0, 3).join(', ')}</div>
+                    <button class="btn-card-details" style="flex: 0 0 auto; padding: 0.35rem 0.75rem;" onclick="window.IyalStudios.closeModal('wizardModal'); window.IyalStudios.openRoleModal('${role.id}')">
                       Explore Role
                     </button>
                   </div>
@@ -885,8 +945,8 @@
           </div>
         </div>
         <div class="modal-footer">
-          <button class="btn-reset-filters" onclick="window.Nexus3D.openCareerWizard()">Restart Quiz</button>
-          <button class="btn-primary-action" onclick="window.Nexus3D.closeModal('wizardModal')">Done</button>
+          <button class="btn-reset-filters" onclick="window.IyalStudios.openCareerWizard()">Restart Quiz</button>
+          <button class="btn-primary-action" onclick="window.IyalStudios.closeModal('wizardModal')">Done</button>
         </div>
       `;
     }
@@ -933,38 +993,38 @@
     DOM.bookmarksModalContent.innerHTML = `
       <div class="modal-header">
         <div>
-          <div class="pipeline-tag">Personal Portfolio</div>
-          <h2 style="font-size: 1.4rem;">Saved Roles Shortlist (${bookmarkedRoles.length})</h2>
+          <div class="pipeline-tag">IYAL STUDIOS Portfolio</div>
+          <h2 style="font-size: 1.3rem;">Saved Roles Shortlist (${bookmarkedRoles.length})</h2>
         </div>
-        <button class="modal-close-btn" onclick="window.Nexus3D.closeModal('bookmarksModal')">
+        <button class="modal-close-btn" onclick="window.IyalStudios.closeModal('bookmarksModal')">
           <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
         </button>
       </div>
 
       <div class="modal-body">
         ${bookmarkedRoles.length === 0 ? `
-          <div style="text-align: center; padding: 3rem 1rem;">
-            <svg viewBox="0 0 24 24" width="42" height="42" stroke="var(--text-dim)" stroke-width="1.5" fill="none" style="margin-bottom: 1rem;"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
-            <h4 style="margin-bottom: 0.4rem;">Your shortlist is empty</h4>
-            <p style="color: var(--text-muted); font-size: 0.88rem;">Bookmark roles while exploring to build your targeted career roadmap.</p>
+          <div style="text-align: center; padding: 2.75rem 1rem;">
+            <svg viewBox="0 0 24 24" width="40" height="40" stroke="var(--text-dim)" stroke-width="1.5" fill="none" style="margin-bottom: 0.85rem;"><path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path></svg>
+            <h4 style="margin-bottom: 0.35rem;">Your shortlist is empty</h4>
+            <p style="color: var(--text-muted); font-size: 0.85rem;">Bookmark roles while exploring to build your targeted career roadmap at IYAL STUDIOS.</p>
           </div>
         ` : `
-          <div style="display: flex; flex-direction: column; gap: 0.85rem; margin-bottom: 1.5rem;">
+          <div style="display: flex; flex-direction: column; gap: 0.75rem; margin-bottom: 1.25rem;">
             ${bookmarkedRoles.map(role => {
               const sw = SOFTWARE_METADATA[role.softwareKey] || {};
               return `
-                <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 0.85rem 1rem;">
+                <div style="display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); border: 1px solid var(--border-subtle); border-radius: var(--radius-md); padding: 0.8rem 0.95rem;">
                   <div>
-                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.2rem;">
-                      <span class="role-id-badge" style="font-size: 0.7rem;">${role.id}</span>
-                      <span class="role-sw-badge ${sw.badgeClass}" style="font-size: 0.68rem; padding: 1px 6px;">${sw.shortName}</span>
+                    <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.15rem;">
+                      <span class="role-id-badge" style="font-size: 0.68rem;">${role.id}</span>
+                      <span class="role-sw-badge ${sw.badgeClass}" style="font-size: 0.65rem; padding: 1px 6px;">${sw.shortName}</span>
                     </div>
-                    <div style="font-weight: 700; color: var(--text-highlight);">${role.title}</div>
-                    <div style="font-size: 0.78rem; color: #38bdf8;">${role.industry}</div>
+                    <div style="font-weight: 700; color: var(--text-highlight); font-size: 0.95rem;">${role.title}</div>
+                    <div style="font-size: 0.75rem; color: #38bdf8;">${role.industry}</div>
                   </div>
-                  <div style="display: flex; gap: 0.5rem;">
-                    <button class="btn-card-details" style="padding: 0.35rem 0.75rem;" onclick="window.Nexus3D.closeModal('bookmarksModal'); window.Nexus3D.openRoleModal('${role.id}')">View</button>
-                    <button class="btn-card-action-icon active-bookmark" onclick="window.Nexus3D.toggleBookmark('${role.id}'); window.Nexus3D.openBookmarksModal();" title="Remove">
+                  <div style="display: flex; gap: 0.4rem;">
+                    <button class="btn-card-details" style="padding: 0.3rem 0.65rem; font-size: 0.78rem;" onclick="window.IyalStudios.closeModal('bookmarksModal'); window.IyalStudios.openRoleModal('${role.id}')">View</button>
+                    <button class="btn-card-action-icon active-bookmark" onclick="window.IyalStudios.toggleBookmark('${role.id}'); window.IyalStudios.openBookmarksModal();" title="Remove">
                       <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
                     </button>
                   </div>
@@ -973,14 +1033,14 @@
             }).join('')}
           </div>
 
-          <div style="display: flex; flex-wrap: wrap; gap: 0.75rem;">
-            <button class="btn-primary-action" onclick="window.Nexus3D.exportShortlistCSV()">
-              <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
-              Export to CSV
+          <div style="display: flex; flex-wrap: wrap; gap: 0.65rem;">
+            <button class="btn-primary-action" onclick="window.IyalStudios.exportShortlistCSV()">
+              <svg viewBox="0 0 24 24" width="15" height="15" stroke="currentColor" stroke-width="2" fill="none"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+              Export CSV
             </button>
-            <button class="btn-reset-filters" onclick="window.Nexus3D.exportShortlistJSON()">Export JSON</button>
-            <button class="btn-reset-filters" onclick="window.print()">Print Resume Spec</button>
-            <button class="btn-reset-filters" style="margin-left: auto; color: #f87171;" onclick="window.Nexus3D.clearBookmarks()">Clear All</button>
+            <button class="btn-reset-filters" onclick="window.IyalStudios.exportShortlistJSON()">Export JSON</button>
+            <button class="btn-reset-filters" onclick="window.print()">Print</button>
+            <button class="btn-reset-filters" style="margin-left: auto; color: #f87171;" onclick="window.IyalStudios.clearBookmarks()">Clear All</button>
           </div>
         `}
       </div>
@@ -998,15 +1058,16 @@
       showToast(`Removed ${roleId} from your shortlist`, 'info');
     } else {
       state.bookmarks.add(roleId);
-      showToast(`Added ${roleId} to your saved shortlist!`, 'success');
+      showToast(`Saved ${roleId} to your IYAL STUDIOS shortlist!`, 'success');
     }
-    localStorage.setItem('nexus3d_bookmarks', JSON.stringify(Array.from(state.bookmarks)));
+    localStorage.setItem('iyal_bookmarks', JSON.stringify(Array.from(state.bookmarks)));
     updateBadges();
     applyFilters();
   }
 
   function clearBookmarks() {
     state.bookmarks.clear();
+    localStorage.removeItem('iyal_bookmarks');
     localStorage.removeItem('nexus3d_bookmarks');
     updateBadges();
     applyFilters();
@@ -1029,13 +1090,14 @@
       state.compareList.add(roleId);
       showToast(`Added ${roleId} to role compare!`, 'success');
     }
-    localStorage.setItem('nexus3d_compare', JSON.stringify(Array.from(state.compareList)));
+    localStorage.setItem('iyal_compare', JSON.stringify(Array.from(state.compareList)));
     updateBadges();
     applyFilters();
   }
 
   function clearCompare() {
     state.compareList.clear();
+    localStorage.removeItem('iyal_compare');
     localStorage.removeItem('nexus3d_compare');
     updateBadges();
     renderComparisonView();
@@ -1049,6 +1111,10 @@
     if (DOM.bookmarkCountBadge) {
       DOM.bookmarkCountBadge.textContent = state.bookmarks.size;
       DOM.bookmarkCountBadge.style.display = state.bookmarks.size > 0 ? 'flex' : 'none';
+    }
+    if (DOM.mobileSavedBadge) {
+      DOM.mobileSavedBadge.textContent = state.bookmarks.size;
+      DOM.mobileSavedBadge.style.display = state.bookmarks.size > 0 ? 'inline-block' : 'none';
     }
     if (DOM.compareCountBadge) {
       DOM.compareCountBadge.textContent = state.compareList.size;
@@ -1070,14 +1136,21 @@
   function switchView(viewName) {
     state.activeView = viewName;
 
-    // Toggle navigation tab active classes
+    // Toggle desktop nav tab active classes
     DOM.navTabs.forEach(btn => {
       const v = btn.getAttribute('data-view');
       if (v === viewName) btn.classList.add('active');
       else btn.classList.remove('active');
     });
 
-    // Toggle view visibility
+    // Toggle mobile bottom nav items active classes
+    DOM.mobileNavItems.forEach(item => {
+      const v = item.getAttribute('data-view');
+      if (v === viewName) item.classList.add('active');
+      else item.classList.remove('active');
+    });
+
+    // Toggle view container visibility
     Object.keys(DOM.views).forEach(key => {
       if (DOM.views[key]) {
         if (key === viewName) {
@@ -1088,14 +1161,14 @@
       }
     });
 
-    // Toggle view toggles on controls bar if card/table
+    // Toggle view toggles on controls bar
     DOM.viewToggles.forEach(t => {
       if (t.getAttribute('data-view') === viewName) t.classList.add('active');
       else t.classList.remove('active');
     });
 
     if (DOM.views[viewName]) {
-      const targetY = Math.max(0, DOM.views[viewName].offsetTop - 100);
+      const targetY = Math.max(0, DOM.views[viewName].offsetTop - 90);
       window.scrollTo({ top: targetY, behavior: 'smooth' });
     }
   }
@@ -1106,6 +1179,7 @@
   function setSoftwareFilter(swId) {
     state.activeSoftware = swId;
     renderSoftwareFilterStrip();
+    if (DOM.mobileSwSelect) DOM.mobileSwSelect.value = swId;
     applyFilters();
   }
 
@@ -1122,6 +1196,7 @@
   function filterByHub(hubName) {
     state.selectedHub = hubName;
     if (DOM.hubFilter) DOM.hubFilter.value = hubName;
+    if (DOM.mobileHubSelect) DOM.mobileHubSelect.value = hubName;
     if (state.activeView !== 'cards' && state.activeView !== 'table') {
       switchView('cards');
     }
@@ -1141,6 +1216,11 @@
     if (DOM.hubFilter) DOM.hubFilter.value = 'all';
     if (DOM.sortSelect) DOM.sortSelect.value = 'default';
 
+    if (DOM.mobileSwSelect) DOM.mobileSwSelect.value = 'all';
+    if (DOM.mobileIndSelect) DOM.mobileIndSelect.value = 'all';
+    if (DOM.mobileHubSelect) DOM.mobileHubSelect.value = 'all';
+    if (DOM.mobileSortSelect) DOM.mobileSortSelect.value = 'id-asc';
+
     renderSoftwareFilterStrip();
     applyFilters();
     showToast('All filters reset to default', 'info');
@@ -1158,14 +1238,14 @@
       csv += `"${r.id}","${r.software}","${r.title}","${r.industry}","${r.responsibilities.replace(/"/g, '""')}","${r.companionTools.join(', ')}","${r.hubs.join(', ')}"\n`;
     });
 
-    downloadFile(csv, '3D_Game_Art_Career_Shortlist.csv', 'text/csv;charset=utf-8;');
+    downloadFile(csv, 'IYAL_Studios_3D_Career_Shortlist.csv', 'text/csv;charset=utf-8;');
     showToast('Downloaded career shortlist CSV!', 'success');
   }
 
   function exportShortlistJSON() {
     const list = Array.from(state.bookmarks).map(id => ROLES_DATA.find(r => r.id === id)).filter(Boolean);
     const jsonStr = JSON.stringify(list, null, 2);
-    downloadFile(jsonStr, '3D_Game_Art_Career_Shortlist.json', 'application/json');
+    downloadFile(jsonStr, 'IYAL_Studios_3D_Career_Shortlist.json', 'application/json');
     showToast('Downloaded career shortlist JSON!', 'success');
   }
 
@@ -1185,7 +1265,7 @@
     const role = ROLES_DATA.find(r => r.id === roleId);
     if (!role) return;
 
-    const text = `3D & GAME ART CAREER BLUEPRINT\nRole: ${role.title} (${role.id})\nSoftware Suite: ${role.software}\nIndustry: ${role.industry}\nResponsibilities: ${role.responsibilities}\nCompanion Tools: ${role.companionTools.join(', ')}\nProduction Hubs: ${role.hubs.join(', ')}`;
+    const text = `IYAL STUDIOS | 3D & GAME ART CAREER BLUEPRINT\nRole: ${role.title} (${role.id})\nSoftware Suite: ${role.software}\nIndustry: ${role.industry}\nResponsibilities: ${role.responsibilities}\nCompanion Tools: ${role.companionTools.join(', ')}\nProduction Hubs: ${role.hubs.join(', ')}`;
     navigator.clipboard.writeText(text).then(() => {
       showToast(`Copied ${role.id} specification to clipboard!`, 'success');
     });
@@ -1271,13 +1351,6 @@
       });
     }
 
-    if (DOM.hubFilter) {
-      DOM.hubFilter.addEventListener('change', (e) => {
-        state.selectedHub = e.target.value;
-        applyFilters();
-      });
-    }
-
     if (DOM.sortSelect) {
       DOM.sortSelect.addEventListener('change', (e) => {
         state.sortBy = e.target.value;
@@ -1312,16 +1385,15 @@
 
     // Keyboard Shortcuts
     window.addEventListener('keydown', (e) => {
-      // '/' or 'Ctrl+K' focuses search
       if ((e.key === '/' || (e.ctrlKey && e.key === 'k')) && document.activeElement !== DOM.searchInput) {
         e.preventDefault();
         DOM.searchInput.focus();
       }
-      // 'Escape' closes modals
       if (e.key === 'Escape') {
         closeModal('roleModal');
         closeModal('bookmarksModal');
         closeModal('wizardModal');
+        closeModal('mobileFilterModal');
       }
     });
 
@@ -1335,8 +1407,8 @@
     });
   }
 
-  // Expose Global Public API for inline HTML onclick handlers
-  window.Nexus3D = {
+  // Expose Global Public API for IYAL STUDIOS
+  window.IyalStudios = {
     openRoleModal,
     closeModal,
     toggleBookmark,
@@ -1345,6 +1417,8 @@
     clearBookmarks,
     openBookmarksModal,
     openCareerWizard,
+    openMobileFilterModal,
+    applyMobileFilters,
     setWizardAnswer,
     exportShortlistCSV,
     exportShortlistJSON,
@@ -1354,6 +1428,9 @@
     switchView,
     resetAllFilters
   };
+
+  // Backwards compatibility alias
+  window.Nexus3D = window.IyalStudios;
 
   // Run on DOM ready
   if (document.readyState === 'loading') {

@@ -1,0 +1,450 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NEXUS 3D | 3D & Game Art Career Directory & Industry Matrix</title>
+  <meta name="description" content="Software-Wise Breakdown of 44 Industry Roles Across AAA Gaming, Film VFX, ArchViz, Digital Fashion & Real-Time Production.">
+  
+  <!-- Google Fonts: Space Grotesk & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Space+Grotesk:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  
+  <!-- Application Stylesheet -->
+  <link rel="stylesheet" href="css/styles.css">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220%22%20%220%22%20%22100%22%20%22100%22><text y=%22.9em%22 font-size=%2290%22>⚡</text></svg>">
+</head>
+<body>
+
+  <!-- Ambient Glowing Mesh -->
+  <div class="bg-ambient">
+    <div class="glow-orb-1"></div>
+    <div class="glow-orb-2"></div>
+    <div class="glow-orb-3"></div>
+  </div>
+
+  <!-- Main Sticky Header & Navigation -->
+  <header class="site-header">
+    <div class="container nav-container">
+      
+      <!-- Brand Logo -->
+      <a class="logo-area" onclick="window.Nexus3D.switchView('cards')">
+        <div class="logo-icon-box">
+          <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2" fill="none">
+            <polygon points="12 2 2 7 12 12 22 7 12 2" stroke="#38bdf8"></polygon>
+            <polyline points="2 17 12 22 22 17" stroke="#6366f1"></polyline>
+            <polyline points="2 12 12 17 22 12" stroke="#ec4899"></polyline>
+          </svg>
+        </div>
+        <div class="logo-text">
+          <div class="logo-brand">NEXUS<span>3D</span></div>
+          <div class="logo-sub">CAREER INTELLIGENCE MATRIX</div>
+        </div>
+      </a>
+
+      <!-- Center Nav Tabs -->
+      <nav class="nav-center">
+        <button class="nav-tab-btn active" data-view="cards">
+          <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          <span>Catalog</span>
+        </button>
+
+        <button class="nav-tab-btn" data-view="table">
+          <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"></path></svg>
+          <span>Master Table</span>
+        </button>
+
+        <button class="nav-tab-btn" data-view="analytics">
+          <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="20" x2="18" y2="10"></line><line x1="12" y1="20" x2="12" y2="4"></line><line x1="6" y1="20" x2="6" y2="14"></line></svg>
+          <span>Analytics</span>
+        </button>
+
+        <button class="nav-tab-btn" data-view="roadmaps">
+          <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76"></polygon></svg>
+          <span>Pipelines</span>
+        </button>
+
+        <button class="nav-tab-btn" data-view="compare">
+          <svg viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="21 16 21 21 16 21"></polyline><line x1="15" y1="15" x2="21" y2="21"></line><line x1="4" y1="4" x2="9" y2="9"></line></svg>
+          <span>Compare</span>
+        </button>
+      </nav>
+
+      <!-- Nav Actions -->
+      <div class="nav-actions">
+        <!-- Theme Toggle -->
+        <button class="btn-icon-nav" id="themeToggleBtn" title="Toggle Light/Dark Theme">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none">
+            <circle cx="12" cy="12" r="5"></circle>
+            <line x1="12" y1="1" x2="12" y2="3"></line>
+            <line x1="12" y1="21" x2="12" y2="23"></line>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+            <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+            <line x1="1" y1="12" x2="3" y2="12"></line>
+            <line x1="21" y1="12" x2="23" y2="12"></line>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+            <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+          </svg>
+        </button>
+
+        <!-- Compare Tray Button -->
+        <button class="btn-icon-nav" onclick="window.Nexus3D.switchView('compare')" title="Role Comparison Matrix">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none">
+            <polyline points="16 3 21 3 21 8"></polyline>
+            <line x1="4" y1="20" x2="21" y2="3"></line>
+            <polyline points="21 16 21 21 16 21"></polyline>
+            <line x1="15" y1="15" x2="21" y2="21"></line>
+            <line x1="4" y1="4" x2="9" y2="9"></line>
+          </svg>
+          <span class="badge-count" id="compareCountBadge" style="display: none;">0</span>
+        </button>
+
+        <!-- Saved Shortlist / Bookmarks Button -->
+        <button class="btn-icon-nav" onclick="window.Nexus3D.openBookmarksModal()" title="View Saved Shortlist">
+          <svg viewBox="0 0 24 24" width="18" height="18" stroke="currentColor" stroke-width="2" fill="none">
+            <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+          </svg>
+          <span class="badge-count" id="bookmarkCountBadge" style="display: none;">0</span>
+        </button>
+
+        <!-- Career Matcher Wizard CTA -->
+        <button class="btn-primary-action" onclick="window.Nexus3D.openCareerWizard()">
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon></svg>
+          <span>Find My Path</span>
+        </button>
+      </div>
+
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="container">
+
+    <!-- Hero Section -->
+    <section class="hero-section">
+      <div class="hero-pill-badge">
+        <span class="pulse-dot"></span>
+        <span>PRODUCTION PIPELINE MATRIX 2026-2027</span>
+      </div>
+
+      <h1 class="hero-title">
+        Master The <span class="gradient-text">3D, Game Art</span> & <br>
+        <span class="cyan-gradient-text">Real-Time</span> Industry Universe
+      </h1>
+
+      <p class="hero-desc">
+        Software-wise blueprint of <strong>44 industry production roles</strong> across AAA Video Games, Feature Film VFX, Photorealistic ArchViz, Next-Gen Digital Fashion, and Real-Time Virtual Production.
+      </p>
+
+      <!-- Key Metrics Row -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-number">44</div>
+          <div class="stat-label">Production Roles</div>
+          <div class="stat-sub">100% Industry Verified</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-number">5</div>
+          <div class="stat-label">Software Suites</div>
+          <div class="stat-sub">Max, Maya, Substance, MD, UE5</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-number">8+</div>
+          <div class="stat-label">Production Hubs</div>
+          <div class="stat-sub">Bengaluru, Mumbai, Chennai & More</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-number">6+</div>
+          <div class="stat-label">Core Verticals</div>
+          <div class="stat-sub">Gaming, VFX, ArchViz, Fashion, Sim</div>
+        </div>
+      </div>
+
+      <!-- Top Software Quick-Jump Strip -->
+      <div class="software-strip" id="softwareStrip">
+        <!-- Injected via JavaScript -->
+      </div>
+    </section>
+
+    <!-- Controls & Filtering Bar -->
+    <section class="controls-bar">
+      <!-- Search Input -->
+      <div class="search-box">
+        <svg class="search-icon" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" class="search-input" id="searchInput" placeholder="Search roles, tools (e.g. ZBrush, Python, Lumen), or keywords... (Press '/' to focus)">
+        <button class="search-clear-btn" id="searchClearBtn" title="Clear Search">
+          <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><line x1="18" y1="6" x2="6" y2="18"></line><line x1="6" y1="6" x2="18" y2="18"></line></svg>
+        </button>
+      </div>
+
+      <!-- Dropdown Filters -->
+      <div class="filter-dropdowns">
+        <!-- Industry Select -->
+        <div class="select-wrapper">
+          <select class="custom-select" id="industryFilter">
+            <option value="all">All Industries</option>
+          </select>
+          <svg class="select-arrow" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </div>
+
+        <!-- Production Hub Select -->
+        <div class="select-wrapper">
+          <select class="custom-select" id="hubFilter">
+            <option value="all">All Production Hubs</option>
+          </select>
+          <svg class="select-arrow" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </div>
+
+        <!-- Sort Select -->
+        <div class="select-wrapper">
+          <select class="custom-select" id="sortSelect">
+            <option value="id-asc">Sort: Role ID</option>
+            <option value="title-asc">Sort: Title (A-Z)</option>
+            <option value="title-desc">Sort: Title (Z-A)</option>
+            <option value="demand-desc">Sort: Demand (Highest)</option>
+            <option value="software">Sort: Software</option>
+          </select>
+          <svg class="select-arrow" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" fill="none"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </div>
+
+        <!-- View Toggle (Cards vs Table) -->
+        <div class="view-mode-toggle">
+          <button class="btn-view-toggle active" data-view="cards" title="Grid Card View">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><rect x="3" y="3" width="7" height="7"></rect><rect x="14" y="3" width="7" height="7"></rect><rect x="14" y="14" width="7" height="7"></rect><rect x="3" y="14" width="7" height="7"></rect></svg>
+          </button>
+          <button class="btn-view-toggle" data-view="table" title="Matrix Table View">
+            <svg viewBox="0 0 24 24" width="16" height="16" stroke="currentColor" stroke-width="2" fill="none"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"></path></svg>
+          </button>
+        </div>
+
+        <!-- Reset Button -->
+        <button class="btn-reset-filters" id="resetFiltersBtn" title="Reset all applied filters">
+          <svg viewBox="0 0 24 24" width="14" height="14" stroke="currentColor" stroke-width="2" fill="none"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path></svg>
+          <span>Reset</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- Active Filters & Counter Status -->
+    <div class="results-status-bar">
+      <div class="results-count" id="rolesCountDisplay">
+        Showing <span>44</span> of <span>44</span> roles
+      </div>
+      <div class="active-filter-chips" id="activeFilterChips"></div>
+    </div>
+
+    <!-- ==========================================
+         VIEW 1: ROLE CARDS GRID
+         ========================================== -->
+    <section id="viewCards">
+      <div class="roles-grid" id="rolesGrid">
+        <!-- Rendered via JavaScript -->
+      </div>
+    </section>
+
+    <!-- ==========================================
+         VIEW 2: MASTER SPREADSHEET TABLE
+         ========================================== -->
+    <section id="viewTable" style="display: none;">
+      <div class="table-view-container">
+        <div class="table-responsive">
+          <table class="matrix-table">
+            <thead>
+              <tr>
+                <th>Role ID</th>
+                <th>Software Suite</th>
+                <th>Job Role</th>
+                <th>Primary Industry</th>
+                <th>Core Responsibilities</th>
+                <th>Companion Tools</th>
+                <th>Production Hubs</th>
+              </tr>
+            </thead>
+            <tbody id="matrixTableBody">
+              <!-- Rendered via JavaScript -->
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         VIEW 3: ECOSYSTEM ANALYTICS & HUB MAPS
+         ========================================== -->
+    <section id="viewAnalytics" class="analytics-dashboard" style="display: none;">
+      <div class="analytics-grid-top">
+        
+        <!-- Software Distribution Panel -->
+        <div class="analytics-panel">
+          <div class="panel-header">
+            <h3 class="panel-title">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="var(--primary)" stroke-width="2" fill="none"><circle cx="12" cy="12" r="10"></circle><path d="M12 2a10 10 0 0 1 10 10H12V2z"></path></svg>
+              Software Suite Market Share
+            </h3>
+            <span class="panel-tag">44 TOTAL ROLES</span>
+          </div>
+          <div id="analyticsSoftwareBars">
+            <!-- Rendered via JavaScript -->
+          </div>
+        </div>
+
+        <!-- Top Metro Production Hubs Panel -->
+        <div class="analytics-panel">
+          <div class="panel-header">
+            <h3 class="panel-title">
+              <svg viewBox="0 0 24 24" width="20" height="20" stroke="#f43f5e" stroke-width="2" fill="none"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
+              Top Production Hubs & Markets
+            </h3>
+            <span class="panel-tag">PAN-INDIA & GLOBAL</span>
+          </div>
+          <div class="hubs-ranking-list" id="analyticsHubsList">
+            <!-- Rendered via JavaScript -->
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Cross-Discipline Tool Synergy Cloud -->
+      <div class="analytics-panel">
+        <div class="panel-header">
+          <h3 class="panel-title">
+            <svg viewBox="0 0 24 24" width="20" height="20" stroke="#f59e0b" stroke-width="2" fill="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+            Most In-Demand Companion Technologies
+          </h3>
+          <span class="panel-tag">CROSS-TOOL SYNERGY</span>
+        </div>
+        <p style="color: var(--text-muted); font-size: 0.88rem; margin-bottom: 1.25rem;">
+          These companion software tools appear most frequently alongside the 5 primary suites across job postings. Click any tool to filter corresponding roles.
+        </p>
+        <div class="tool-synergy-grid" id="analyticsToolsGrid">
+          <!-- Rendered via JavaScript -->
+        </div>
+      </div>
+    </section>
+
+    <!-- ==========================================
+         VIEW 4: PRODUCTION PIPELINE ROADMAPS
+         ========================================== -->
+    <section id="viewRoadmaps" style="display: none;">
+      <div style="text-align: center; max-width: 700px; margin: 0 auto 2.5rem;">
+        <h2 style="font-size: 2rem; margin-bottom: 0.5rem;">Studio Production Pipelines</h2>
+        <p style="color: var(--text-muted);">
+          Explore how 3D modeling, dynamic cloth simulations, PBR texturing, and game engine integration connect sequentially within modern production houses.
+        </p>
+      </div>
+
+      <div class="pipelines-container" id="pipelinesContainer">
+        <!-- Rendered via JavaScript -->
+      </div>
+    </section>
+
+    <!-- ==========================================
+         VIEW 5: ROLE COMPARISON MATRIX
+         ========================================== -->
+    <section id="viewCompare" style="display: none;">
+      <div class="comparison-container" id="comparisonContainer">
+        <!-- Rendered via JavaScript -->
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==========================================
+       MODALS & DRAWERS
+       ========================================== -->
+
+  <!-- Modal: Role Blueprint Details -->
+  <div class="modal-overlay" id="roleModal">
+    <div class="modal-dialog" id="roleModalContent">
+      <!-- Injected via JavaScript -->
+    </div>
+  </div>
+
+  <!-- Modal: Career Matcher Wizard -->
+  <div class="modal-overlay" id="wizardModal">
+    <div class="modal-dialog" id="wizardModalContent">
+      <!-- Injected via JavaScript -->
+    </div>
+  </div>
+
+  <!-- Modal: Saved Shortlist / Bookmarks -->
+  <div class="modal-overlay" id="bookmarksModal">
+    <div class="modal-dialog" id="bookmarksModalContent">
+      <!-- Injected via JavaScript -->
+    </div>
+  </div>
+
+  <!-- Toast Notification Hub -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Site Footer -->
+  <footer class="site-footer">
+    <div class="container">
+      <div class="footer-grid">
+        <div>
+          <div class="logo-brand" style="margin-bottom: 0.75rem;">NEXUS<span>3D</span></div>
+          <p style="font-size: 0.85rem; color: var(--text-muted); line-height: 1.6; max-width: 380px;">
+            The comprehensive industry career intelligence ecosystem for 3D modeling, VFX, character animation, digital fashion, and Unreal Engine real-time development.
+          </p>
+          <div style="margin-top: 1.25rem; font-family: var(--font-mono); font-size: 0.75rem; color: #38bdf8;">
+            44 High-Demand Industry Roles Documented
+          </div>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Primary Software</h4>
+          <ul class="footer-links">
+            <li><a href="javascript:void(0)" onclick="window.Nexus3D.filterByTool('3ds Max')">Autodesk 3ds Max (9)</a></li>
+            <li><a href="javascript:void(0)" onclick="window.Nexus3D.filterByTool('Maya')">Autodesk Maya (9)</a></li>
+            <li><a href="javascript:void(0)" onclick="window.Nexus3D.filterByTool('Substance 3D Painter')">Substance 3D Painter (9)</a></li>
+            <li><a href="javascript:void(0)" onclick="window.Nexus3D.filterByTool('Marvelous Designer')">Marvelous Designer (6)</a></li>
+            <li><a href="javascript:void(0)" onclick="window.Nexus3D.filterByTool('Unreal Engine 5')">Unreal Engine 5 (11)</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Production Hubs</h4>
+          <ul class="footer-links">
+            <li><a href="javascript:void(0)" onclick="window.Nexus3D.filterByHub('Bengaluru')">Bengaluru Game Studios</a></li>
+            <li><a href="javascript:void(0)" onclick="window.Nexus3D.filterByHub('Chennai')">Chennai Animation & VFX</a></li>
+            <li><a href="javascript:void(0)" onclick="window.Nexus3D.filterByHub('Mumbai')">Mumbai Film & ICVFX</a></li>
+            <li><a href="javascript:void(0)" onclick="window.Nexus3D.filterByHub('Hyderabad')">Hyderabad Game Co-Dev</a></li>
+            <li><a href="javascript:void(0)" onclick="window.Nexus3D.filterByHub('Pune')">Pune Tech Art & Sim</a></li>
+          </ul>
+        </div>
+
+        <div>
+          <h4 class="footer-col-title">Career Tools</h4>
+          <ul class="footer-links">
+            <li><a href="javascript:void(0)" onclick="window.Nexus3D.openCareerWizard()">Career Pathway Matcher</a></li>
+            <li><a href="javascript:void(0)" onclick="window.Nexus3D.openBookmarksModal()">Export Career Shortlist (CSV)</a></li>
+            <li><a href="javascript:void(0)" onclick="window.Nexus3D.switchView('compare')">Side-by-Side Comparison</a></li>
+            <li><a href="javascript:void(0)" onclick="window.Nexus3D.switchView('roadmaps')">Production Pipelines</a></li>
+            <li><a href="javascript:void(0)" onclick="window.Nexus3D.switchView('analytics')">Market Share Intelligence</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <div>
+          &copy; 2026 NEXUS 3D. Curated for Artists, Riggers, Animators, Level Designers & Game Programmers.
+        </div>
+        <div>
+          Aligned with Premier Media & Animation Institutes (MAAC / Studio Standards).
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Core Scripts -->
+  <script src="js/data.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
